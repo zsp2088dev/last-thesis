@@ -1,8 +1,6 @@
 \chapter{設計と実装}
 本性では，提案ツールを開発するときのアプローチを述べる．
 
-\section{提案ツールの設計}
-
 \section{開発環境}
 提案ツールの開発環境を下記に示す．
 
@@ -11,8 +9,6 @@
     \item プログラミング言語：Python 3.7
     \item 統合開発環境：PyCharm 2020.3.2
 \end{itemize}
-
-\section{実装規模}
 
 \section{提案ツールのアーキテクチャ}
 \begin{figure}[H]
@@ -23,13 +19,13 @@
 \end{figure}
 
 提案ツールのアーキテクチャを図\ref{architecture}に示す．
-提案ツールのmilkは，既存のCI/CDツール上で動作することを想定しており，CI/CDツールにはGitHub Actionsを用いた．
-CI/CDツール上でできることが限られているため，同時に，Slackとのやりとりや，開発プロジェクトの状態の管理を行うことができるRESTful APIの開発も行った．
-RESTful APIにはFastAPIを使用し，各種データの保持はJSONファイルのI/Oにて管理を行っている．
+提案ツールは，既存のCI/CDツール上で動作することを想定しており，本研究ではCI/CDツールにGitHub Actionsを用いた．
+また，CI/CDツール上で乖離の検知を行うが，できることが限られているため，同時に，Slackとのやりとりや，開発プロジェクトの状態の管理を行うことができるRESTful APIの開発も行った．
+RESTful APIにはFastAPIを使用し，各種データの保持はJSONファイルにて管理を行っている．
 また，RESTful APIは筆者のローカルPC上で動作させているが，HTTPSとして外部公開させることができるツールのngrokを使用しており，
-Slack APIやCI/CD上で動作するmilkはローカルPC上で動作するRESTful APIを使用できるようになっている．
+Slack APIやCI/CDツール上で動作する提案ツールは，ローカルPC上で動作するRESTful APIを使用できるようになっている．
 
-RESTful APIには，下記の機能をもたせているが，乖離検知の処理はすべてmilkで行う
+RESTful APIには，下記の機能をもたせているが，乖離検知の処理はすべてCI/CD上で動作するツールで行う
 
 \begin{itemize}
     \item 各機能のステータスを更新する機能
@@ -37,18 +33,33 @@ RESTful APIには，下記の機能をもたせているが，乖離検知の処
     \item SlackのAPIを呼び出してメッセージを送受信する機能
 \end{itemize}
 
+Slackからに入力したコマンドをRESTful APIに反映させるための手順を下記にまとめる．
+\begin{enumerate}
+    \item Slackにコマンドを入力する
+    \item Incoming Webhookより，SlackからRESTful APIに入力したコマンド内容がPOSTで送信される
+    \item RESTful APIでは，受け取ったコマンドを解析し，適切な処理を行う
+    \item 必要があれば，Slackにメッセージを送信する
+\end{enumerate}
+
+また，乖離検知を行い，検知した内容をSlackへと送信するための手順を下記にまとめる．
+\begin{enumerate}
+    \item GitHubへのプッシュを検知し，CI/CDツールが起動する
+    \item CI/CD上で乖離検知を行うために，必要なデータをRESTful APIから取得する
+    \item 取得したデータをもとに，乖離検知を行う
+    \item 乖離検知をした場合，検知した内容を整形してメッセージとしてまとめ，RESTful APIにPOSTリクエストを行う
+    \item RESTful APIからSlackにメッセージを送信する
+\end{enumerate}
+
 開発者は，適切なタイミングで変更を記録するためにコミットを実行し，リモートリポジトリにプッシュすることを期待している．
 リモートリポジトリにプッシュされたタイミングで，CI/CDツールが起動し，CI/CDツールの設定ファイルに定義されたコマンドが実行される．
 このとき，Pythonで作成したmilkコマンドを実行するために，CI/CDツール上でPython環境を構築している．
 乖離リスクの検知を行うために，まずRESTful APIから開発プロジェクトの現状態を取得する．
 その後，C1~C4について乖離リスクの検知を行い，検知したときにRESTful APIを通じてSlackへとメッセージを送信する．
 
-
-
-
-Slackにmilkコマンドが入力されると，SlackからRESTful APIにHTTPリクエストを行われるため，これを適切にハンドリングすることでJSONファイルに値を書き込むことができる．
-
 \section{提案ツールの使用方法}
+提案ツールは，GitHub Actionsを利用可能な状況では簡単に利用することができる．
+例えばプロジェクトのディレクトリにtoolsディレクトリを作成し，そのディレクトリの中にPythonで作成された提案ツールを配置する．
+CI/CDツールの設定ファイルには，プッシュ時に提案ツールを実行するように記述するだけでよい．
 
 \section{コミュニケーションツールで利用可能なコマンド}
 milkでは，Slackのスラッシュコマンドを活用することで，各種パラメータの設定を行うことができるようになっている．
