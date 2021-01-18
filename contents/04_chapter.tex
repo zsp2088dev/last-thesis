@@ -21,10 +21,10 @@
 \end{figure}
 
 提案ツールのアーキテクチャを図\ref{architecture}に示す．
-提案ツールは，既存のCI/CDツール上で動作することを想定しており，本研究ではCI/CDツールにGitHub Actionsを用いた．
+提案ツールは，既存のCI/CDツール上で動作することを想定しており，本研究ではCI/CDツールにGitHub Actions\cite{actions}を用いた．
 また，CI/CDツール上で乖離の検知を行うが，できることが限られているため，同時に，Slackとのやりとりや，開発プロジェクトの状態の管理を行うことができるRESTful APIの開発も行った．
 RESTful APIにはFastAPIを使用し，各種データの保持はJSONファイルにて管理を行っている．
-また，RESTful APIは筆者のローカルPC上で動作させているが，HTTPSとして外部公開させることができるツールのngrokを使用しており，
+また，RESTful APIは筆者のローカルPC上で動作させているが，HTTPSとして外部公開させることができるツールのngrok\cite{ngrok}を使用しており，
 Slack APIやCI/CDツール上で動作する提案ツールは，ローカルPC上で動作するRESTful APIを使用できるようになっている．
 
 RESTful APIには，下記の機能をもたせているが，乖離検知の処理はすべてCI/CDツール上で動作するツールで行う.
@@ -59,7 +59,7 @@ Slackからに入力したコマンドをRESTful APIに反映させるための�
 まず，CI/CDツール上で動作させるために，プロジェクトのディレクトリにtoolsディレクトリを作成し，そのディレクトリの中にPythonで作成された提案ツールを配置する．
 CI/CDツールの設定ファイルには，プッシュ時に提案ツールを実行するように記述するだけでよい．
 次に，SlackのAPIページより，提案ツールを登録する必要がある．
-最後にRESTful APIの動作環境を用意する必要がある．例えばGCP(Google Cloud Platform)やHerokuなどのPaaS(Platform as aa Service)を利用することで，RESTful APIを動作する環境を用意することができる．
+最後にRESTful APIの動作環境を用意する必要がある．例えばGCP(Google Cloud Platform)\cite{gcp}やHeroku\cite{heroku}などのPaaS(Platform as aa Service)を利用することで，RESTful APIを動作する環境を用意することができる．
 筆者が作成したRESTful APIをSaaSとして展開し，数多くのプロジェクトで利用することもできるが，現状ではセキュリティ上の懸念から各プロジェクトでRESTful APIを構築するのが望ましい．
 いずれも，各Webサービスの登録手順に従って進めていくだけでよく，PaaSをよく理解していればRESTful APIの実行環境を簡単に構築することができる．
 
