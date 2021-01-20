@@ -21,6 +21,45 @@
 本機能は，RESTful API開発に利用可能であり，プログラミング言語にPython，ドキュメントにSwaggerを選択する必要がある．
 開発者は，この通知を受け取ったときに，ドキュメントに適切なものを追加するか，誤ったアノテーションを修正し，ドキュメントとソースコードの乖離を抑制することを期待する．
 
+具体的な仕組みについて，FastAPIを使用したRESTful APIのソースコード\ref{c1code}に，Swaggerのドキュメント\ref{c1doc}を例にまとめる．
+これは，GETメソッドで/usersにHTTPリクエストを送信すると，ユーザーの一覧取得を行うことのできるRESTful AIPのソースコードとドキュメントである．
+Swagger形式のドキュメントは，JSONまたはYAMLで記述することができる．
+ドキュメント中のoperationIdはオプション値であり，エンドポイント毎にユニークな値を設定する必要がある．
+また，機能となる関数の上部(FastAPIではデコーレータである@appの上部)に，コメントアウトで@operationIdと記述することで，ドキュメントとソースコードの対応付けを簡単に行えるようになる．
+
+\begin{lstlisting}[caption=RESTful API, label=c1code]
+# @operationId get_users
+@app.get('/users')
+def get_users():
+    response = []
+
+    for user in get_users_from_db():
+        response.append({
+            'user_id': user.user_id,
+            'name': user.name,
+            'age': user.age
+        })
+
+    return response
+\end{lstlisting}
+
+
+\begin{lstlisting}[caption=Swagger,label=c1doc]
+"paths": {
+     "/users": {
+         "get": {
+            "summary": "Get a list of users.",
+            "operationId": "get_users",
+            "responses": {
+                "200": {
+                "description": "Successfully get the list of users."
+                }
+            }
+        }
+    }
+}
+\end{lstlisting}
+
 \subsection{C2：一定時間経過後のリマインダーの機能}
 ドキュメントが作成され一定時間経過した後，ソースコードは更新され続けているがドキュメントは更新されていない場合に，乖離リスクとして開発者に通知する．
 本機能は，ドキュメントとソースコードが同じリポジトリで管理されることを想定している．

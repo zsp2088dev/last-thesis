@@ -6,16 +6,28 @@
 \usepackage{graphics}
 \usepackage{float}
 \usepackage{url}
+\usepackage{listings,jvlisting}
 
 \lstset{
-    basicstyle={\roboto},
-    frame=tRBl,
-    breaklines=true,
-    framesep=10pt,
-    linewidth=15cm,
-    lineskip=-0.5ex,
-    tabsize=2
+  basicstyle={\ttfamily},
+  identifierstyle={\small},
+  commentstyle={\smallitshape},
+  keywordstyle={\small\bfseries},
+  ndkeywordstyle={\small},
+  stringstyle={\small\ttfamily},
+  frame={tb},
+  breaklines=true,
+  columns=[l]{fullflexible},
+  numbers=left,
+  xrightmargin=0zw,
+  xleftmargin=3zw,
+  numberstyle={\scriptsize},
+  stepnumber=1,
+  numbersep=1zw,
+  lineskip=-0.5ex
 }
+
+\renewcommand{\lstlistingname}{ソースコード}
 
 \begin{document}
 
