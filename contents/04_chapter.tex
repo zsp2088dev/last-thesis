@@ -27,13 +27,6 @@ RESTful APIにはFastAPIを使用し，各種データの保持はJSONファイ�
 また，RESTful APIは筆者のローカルPC上で動作させているが，HTTPSとして外部公開させることができるツールのngrok\cite{ngrok}を使用しており，
 Slack APIやCI/CDツール上で動作する提案ツールは，ローカルPC上で動作するRESTful APIを使用できるようになっている．
 
-RESTful APIには，下記の機能をもたせているが，乖離検知の処理はすべてCI/CDツール上で動作するツールで行う.
-\begin{itemize}
-    \item 各機能のステータスを更新する機能
-    \item Gitのコミットの差分量を追加する機能
-    \item SlackのAPIを呼び出してメッセージを送受信する機能
-\end{itemize}
-
 Slackからに入力したコマンドをRESTful APIに反映させるための手順を下記にまとめる．
 \begin{enumerate}
     \item Slackにコマンドを入力する
@@ -50,6 +43,26 @@ Slackからに入力したコマンドをRESTful APIに反映させるための�
     \item 乖離検知をした場合，検知した内容を整形してメッセージとしてまとめ，RESTful APIにPOSTリクエストを行う
     \item RESTful APIからSlackにメッセージを送信する
 \end{enumerate}
+
+\section{RESTful APIの実装}
+RESTful APIで利用可能な機能を下記にまとめる．
+これらの機能はすべて1つのファイル(main.py)に集約されており，行数は162行である．
+\begin{description}
+    \item[GET：/data/\{project\_code\}] 乖離検知に必要なデータを取得
+    \item[POST：/status/update/\{project\_code\}]  乖離検知に必要なデータを更新
+    \item[GET：/git/log/\{project\_code\}] 整形したGitのコミット履歴を取得
+    \item[POST：/git/log/\{project\_code\}] 整形したGitのコミット履歴を登録
+    \item[POST：/message/\{project\_code\}] Slackに通知を送信
+    \item[POST：/milk] Slackに入力したコマンドを受け取り，適切な処理を実行
+\end{description}
+
+また，RESTful APIに使用したライブラリとその選定理由を下記にまとめる．
+\begin{description}
+    \item[FastAPI] RESTful APIを簡易的に構築可能
+    \item[Uvicorn] FastAPIを動作させるために必要
+    \item[Slack Bolt] Slack APIとの通信を簡易的に行うことができる
+    \item[requests] HTTPリクエストを直感的に扱うことが可能
+\end{description}
 
 \section{提案ツールの使用方法}
 開発者は，適切なタイミングで変更を記録するためにコミットを実行し，リモートリポジトリにプッシュすることを期待している．
