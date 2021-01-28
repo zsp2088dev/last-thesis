@@ -64,6 +64,53 @@ RESTful APIで利用可能な機能を下記にまとめる．
     \item[requests] HTTPリクエストを直感的に扱うことが可能
 \end{description}
 
+\ref{toolartchitecture}節で述べたとおり，RESTful APIでは乖離検知に必要な状態管理を行っている．
+下記に実際に提案ツールで使用している状態とパラメータの管理を行うJSONファイルの中身を示す．
+パラメータはSlackからのコマンドによって更新され，状態はCI/CDツール上で動作するプログラムによって更新される．
+例えば，C4のソースコード変更量の検知では，前回のドキュメントが更新されてから現在のソースコードの変更量が137行であることを示している．
+\begin{lstlisting}[caption=状態とパラメメータの管理の例, label=status]
+{
+    "c1": {
+        "param": {
+            "code_type": ".py",
+            "doc_file": "swagger.json"
+        },
+        "status": {}
+    },
+    "c2": {
+        "param": {
+            "doc_type": ".py",
+            "code_type": ".md",
+            "max_days": 7
+        },
+        "status": {
+            "date": "2020-12-13"
+        }
+    },
+    "c3": {
+        "param": {
+            "doc_type": ".py",
+            "code_type": ".md",
+            "path": "../../setup.py"
+        },
+        "status": {
+            "version": "0.0.1"
+        }
+    },
+    "c4": {
+        "param": {
+            "doc_type": ".py",
+            "code_type": ".md"
+        },
+        "status": {
+            "sum_change": 137,
+            "max_change": 10000
+        }
+    }
+}
+\end{lstlisting}
+    
+
 \section{提案ツールの使用方法}
 開発者は，適切なタイミングで変更を記録するためにコミットを実行し，リモートリポジトリにプッシュすることを期待している．
 \ref{toolartchitecture}節にまとめたとおり，提案ツールはリモートリポジトリにプッシュされたタイミングで，CI/CDツールが起動し，CI/CDツールの設定ファイルに定義されたコマンドに従って実行される．
